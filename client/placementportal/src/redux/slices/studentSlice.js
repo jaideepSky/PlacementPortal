@@ -46,18 +46,22 @@ const studentSlice = createSlice({
             const {id,skill} = action.payload
             const find = state.students.find((student)=>student.id === id)
             if(find){
-               if(state.students[find].skill.includes(skill)){
+               if(find.skills.includes(skill)){
                 state.error = "Skill already exists for this student."
                }
                else{
-                state.students[find].skill.push(skill)
+                find.skills.push(skill)
                 state.error = null
                }
             }
-        }
+        },
+         // CLEAR ERROR
+    clearError: (state) => {
+      state.error = null
+    }
 
     }
 })
 
 export default studentSlice.reducer;
-export const {addStudent,deleteStudent,updateStudent,addSkill} = studentSlice.actions;
+export const {addStudent,deleteStudent,updateStudent,addSkill,clearError} = studentSlice.actions;

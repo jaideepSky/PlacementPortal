@@ -57,9 +57,13 @@ const slice = createSlice({
             state.role = null
             state.isAuthenticated = false
             state.error = null
-        }
+        },
+         // CLEAR ERROR
+    clearError: (state) => {
+      state.error = null
+    }
     }
 
 })
-export const {login,register,logout} = slice.actions
+export const {login,register,logout,clearError} = slice.actions
 export default slice.reducer

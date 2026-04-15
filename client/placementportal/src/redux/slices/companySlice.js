@@ -37,8 +37,12 @@ const companySlice = createSlice({
             }
 
         },
+         // CLEAR ERROR
+    clearError: (state) => {
+      state.error = null
+    }
     }
 })
 
 export default companySlice.reducer;
-export const {addcompany,deletecompany,updateCompany} = companySlice.actions;
+export const {addcompany,deletecompany,updateCompany,clearError} = companySlice.actions;
