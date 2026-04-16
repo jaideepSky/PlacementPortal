@@ -8,6 +8,7 @@ const slice = createSlice({
        role : null, // student or admin
        isAuthenticated : false,
        users: mockStudents,
+       loading : false,
        error :null,
     },
     reducers:{
@@ -26,6 +27,7 @@ const slice = createSlice({
             else{
                 state.error = "Invalid email or password"
             }
+            state.loading = false
 
         },
 
@@ -50,6 +52,7 @@ const slice = createSlice({
                 state.isAuthenticated = true
                 state.error = null
             }
+                 state.loading = false
         },
         // Logout action
         logout : (state,action)=>{
@@ -57,6 +60,7 @@ const slice = createSlice({
             state.role = null
             state.isAuthenticated = false
             state.error = null
+             state.loading = false
         },
          // CLEAR ERROR
     clearError: (state) => {
