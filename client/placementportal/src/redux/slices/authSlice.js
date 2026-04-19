@@ -1,5 +1,5 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
-import { mockStudents } from "../../data/mockData";
+import { mockUsers } from "../../data/mockData";
 
 const slice = createSlice({
     name:'auth',
@@ -7,8 +7,7 @@ const slice = createSlice({
        userdata : null , // current loggedin user details
        role : null, // student or admin
        isAuthenticated : false,
-       users: mockStudents,
-       loading : false,
+       users: mockUsers,
        error :null,
     },
     reducers:{
@@ -18,6 +17,7 @@ const slice = createSlice({
             const found = state.users.find((user)=>{
                 return user.email == email && user.password == password
             })
+            
             if(found){
                 state.userdata = found
                 state.role = found.role
@@ -33,7 +33,8 @@ const slice = createSlice({
 
         // Register action
         register : (state,action)=>{
-            const {name,email,password} = action.payload
+            state.loading = true
+            const {name,email,password,rollNo,department,year,cgpa,phone} = action.payload
             const exists = state.users.find((user)=>user.email == email)
             if(exists){
                 state.error = "Email already exists"
@@ -44,10 +45,15 @@ const slice = createSlice({
                     name:name,
                     email:email,
                     password:password,
-                    role:'student' // new users are always students
+                    role:'student', // default role
+                    rollNo:rollNo,
+                    department:department,
+                    year:year,
+                    cgpa:cgpa,
+                    phone:phone
                 }
                 state.users.push(newUser)
-                state.user = newUser
+                state.userdata = newUser
                 state.role = 'student'
                 state.isAuthenticated = true
                 state.error = null
@@ -56,7 +62,7 @@ const slice = createSlice({
         },
         // Logout action
         logout : (state,action)=>{
-            state.user = null
+            state.userdata = null
             state.role = null
             state.isAuthenticated = false
             state.error = null

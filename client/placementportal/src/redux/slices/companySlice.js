@@ -5,13 +5,13 @@ const companySlice = createSlice({
 
     name:'companies',
     initialState:{
-        companies : mockCompanies,
+        companiesList : mockCompanies,
         error : null
     },
     reducers:{
         // add company only by admin
         addcompany:(state,action)=>{
-            const existingCompany = state.companies.find(company => company.name.toLowerCase() === action.payload.name.toLowerCase());
+            const existingCompany = state.companiesList.find(company => company.name.toLowerCase() === action.payload.name.toLowerCase());
             if(existingCompany){
                 state.error = "Company with this name already exists.";
             }
@@ -20,20 +20,20 @@ const companySlice = createSlice({
                     id:nanoid(),
                     ...action.payload
                 }
-                state.companies.push(newCompany);
+                state.companiesList.push(newCompany);
                 state.error = null;
             }
         },
 
         deletecompany:(state,action)=>{
-            state.companies = state.companies.filter(company => company.id !== action.payload.id);
+            state.companiesList = state.companiesList.filter(company => company.id !== action.payload.id);
         },
 
         updateCompany:(state,action)=>{
             const {id , ...updateData} = action.payload
-            const companyIndex = state.companies.findIndex(company => company.id === id);
+            const companyIndex = state.companiesList.findIndex(company => company.id === id);
             if(companyIndex!==-1){
-                state.companies[companyIndex] = {...state.companies[companyIndex],...updateData}
+                state.companiesList[companyIndex] = {...state.companiesList[companyIndex],...updateData}
             }
 
         },

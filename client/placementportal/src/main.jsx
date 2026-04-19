@@ -10,6 +10,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import store from './redux/store';
 import Register from './pages/Register';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import StudentDashboard from './pages/student/StudentDashboard';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -26,6 +28,15 @@ const router = createBrowserRouter([
       {
         path:'/register',
         element: <Register/>,
+      },
+      {
+        path:'/admin/dashboard',
+        element: <AdminDashboard/>,
+      },
+    
+      {
+        path:'/student/dashboard',
+        element: <StudentDashboard/>,
       }
     ]
   },

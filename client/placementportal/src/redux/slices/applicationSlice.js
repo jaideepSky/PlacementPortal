@@ -5,7 +5,7 @@ const applicationSlice = createSlice({
 
     name:'applications',
     initialState:{
-        list :mockApplications,
+        applicationsList :mockApplications,
         error : null
     },
     reducers:{
@@ -14,7 +14,7 @@ const applicationSlice = createSlice({
             const { studentId, companyId } = action.payload;
             
             // check if the student has already applied to the company
-            const existingApplication = state.list.find((application)=>application.studentId === studentId && application.companyId === companyId)
+            const existingApplication = state.applicationsList.find((application)=>application.studentId === studentId && application.companyId === companyId)
             if(existingApplication){
                 state.error = "You have already applied to this company."
             }
@@ -25,16 +25,16 @@ const applicationSlice = createSlice({
                     appliedAt :  new Date().toISOString().split('T')[0],
                     ...action.payload
                 }
-                state.list.push(newApplication)
+                state.applicationsList.push(newApplication)
                 state.error = null
             }
         },
         // Admin updates application status
         updateApplicationStatus : (state,action)=>{
             const {id , status} = action.payload;
-            const index = state.list.findIndex((application)=>application.id === id)
+            const index = state.applicationsList.findIndex((application)=>application.id === id)
             if(index !== -1){
-                state.list[index].status = status; // Update the status of the application
+                state.applicationsList[index].status = status; // Update the status of the application
                 
             }
         },
