@@ -10,7 +10,7 @@ const companySlice = createSlice({
     },
     reducers:{
         // add company only by admin
-        addcompany:(state,action)=>{
+        addCompany:(state,action)=>{
             const existingCompany = state.companiesList.find(company => company.name.toLowerCase() === action.payload.name.toLowerCase());
             if(existingCompany){
                 state.error = "Company with this name already exists.";
@@ -25,7 +25,7 @@ const companySlice = createSlice({
             }
         },
 
-        deletecompany:(state,action)=>{
+        deleteCompany:(state,action)=>{
             state.companiesList = state.companiesList.filter(company => company.id !== action.payload.id);
         },
 
@@ -45,4 +45,4 @@ const companySlice = createSlice({
 })
 
 export default companySlice.reducer;
-export const {addcompany,deletecompany,updateCompany,clearError} = companySlice.actions;
+export const {addCompany,deleteCompany,updateCompany,clearError} = companySlice.actions;
