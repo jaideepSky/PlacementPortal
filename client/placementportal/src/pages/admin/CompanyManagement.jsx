@@ -25,44 +25,65 @@ const emptyForm = {
 }
 
 // ── CompanyFormModal ──────────────────────────────────────────
+import { useForm } from 'react-hook-form'
+
 function CompanyFormModal({ initial, onSave, onClose }) {
-  const [form, setForm]       = useState(initial ? { ...initial } : { ...emptyForm })
+
+  
   const [reqInput, setReqInput] = useState("")
-  const [errors, setErrors]   = useState({})
+  const [requirements, setRequirements] = useState(
+    initial?.requirements || []
+  )
 
-  const update = (key, val) => setForm(f => ({ ...f, [key]: val }))
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    defaultValues: initial ? { ...initial } : {
+      name:        '',
+      logo:        '',
+      industry:    'Technology',
+      location:    '',
+      packageLPA:  '',
+      positions:   '',
+      minCGPA:     '',
+      deadline:    '',
+      description: '',
+      status:      'Active',
+      jobRole:     '',
+    }
+  })
 
+ 
   const addReq = () => {
     const r = reqInput.trim()
-    if (r && !form.requirements.includes(r)) update("requirements", [...form.requirements, r])
+    if (r && !requirements.includes(r)) {
+      setRequirements([...requirements, r])
+    }
     setReqInput("")
   }
 
-  const removeReq = (r) => update("requirements", form.requirements.filter(x => x !== r))
+  const removeReq = (r) => setRequirements(requirements.filter(x => x !== r))
 
-  const validate = () => {
-    const e = {}
-    if (!form.name.trim())    e.name       = "Company name is required"
-    if (!form.jobRole.trim()) e.jobRole    = "Job role is required"
-    if (!form.location.trim()) e.location  = "Location is required"
-    if (!form.deadline)        e.deadline  = "Deadline is required"
-    if (form.packageLPA <= 0)  e.packageLPA = "Package must be > 0"
-    if (form.positions <= 0)   e.positions  = "Positions must be > 0"
-    if (form.minCGPA < 0 || form.minCGPA > 10) e.minCGPA = "CGPA must be 0–10"
-    setErrors(e)
-    return Object.keys(e).length === 0
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!validate()) return
-    const logo = form.logo || form.name.charAt(0).toUpperCase()
-    onSave({ ...form, logo })
+  // ← RHF calls this only if all validations pass
+  const onSubmit = (data) => {
+    const logo = data.logo || data.name.charAt(0).toUpperCase()
+    onSave({
+      ...data,
+      logo,
+      requirements,           // ← add requirements manually
+      packageLPA: parseFloat(data.packageLPA),
+      positions:  parseInt(data.positions),
+      minCGPA:    parseFloat(data.minCGPA),
+    })
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -75,19 +96,28 @@ function CompanyFormModal({ initial, onSave, onClose }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* ← handleSubmit wraps onSubmit */}
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+
           {/* Name & Logo */}
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Company Name *</label>
-              <input value={form.name} onChange={e => update("name", e.target.value)} placeholder="e.g. Google"
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? "border-red-300" : "border-gray-200"}`} />
-              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+              <input
+                placeholder="e.g. Google"
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? "border-red-300" : "border-gray-200"}`}
+                {...register('name', { required: 'Company name is required' })}
+              />
+              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Logo Text</label>
-              <input value={form.logo} onChange={e => update("logo", e.target.value)} placeholder="e.g. G (auto-set)" maxLength={3}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                placeholder="e.g. G (auto-set)"
+                maxLength={3}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register('logo')}
+              />
             </div>
           </div>
 
@@ -95,15 +125,19 @@ function CompanyFormModal({ initial, onSave, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Industry *</label>
-              <select value={form.industry} onChange={e => update("industry", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+              <select
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                {...register('industry')}
+              >
                 {INDUSTRY_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Status *</label>
-              <select value={form.status} onChange={e => update("status", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+              <select
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                {...register('status')}
+              >
                 {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
@@ -113,15 +147,21 @@ function CompanyFormModal({ initial, onSave, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Role *</label>
-              <input value={form.jobRole} onChange={e => update("jobRole", e.target.value)} placeholder="e.g. Software Engineer"
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.jobRole ? "border-red-300" : "border-gray-200"}`} />
-              {errors.jobRole && <p className="text-xs text-red-500 mt-1">{errors.jobRole}</p>}
+              <input
+                placeholder="e.g. Software Engineer"
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.jobRole ? "border-red-300" : "border-gray-200"}`}
+                {...register('jobRole', { required: 'Job role is required' })}
+              />
+              {errors.jobRole && <p className="text-xs text-red-500 mt-1">{errors.jobRole.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Location *</label>
-              <input value={form.location} onChange={e => update("location", e.target.value)} placeholder="e.g. Bangalore, India"
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-300" : "border-gray-200"}`} />
-              {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+              <input
+                placeholder="e.g. Bangalore, India"
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-300" : "border-gray-200"}`}
+                {...register('location', { required: 'Location is required' })}
+              />
+              {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location.message}</p>}
             </div>
           </div>
 
@@ -129,52 +169,81 @@ function CompanyFormModal({ initial, onSave, onClose }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Package (LPA) *</label>
-              <input type="number" min="0" step="0.5" value={form.packageLPA || ""} onChange={e => update("packageLPA", parseFloat(e.target.value) || 0)} placeholder="e.g. 12"
-                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.packageLPA ? "border-red-300" : "border-gray-200"}`} />
-              {errors.packageLPA && <p className="text-xs text-red-500 mt-1">{errors.packageLPA}</p>}
+              <input
+                type="number" min="0" step="0.5" placeholder="e.g. 12"
+                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.packageLPA ? "border-red-300" : "border-gray-200"}`}
+                {...register('packageLPA', {
+                  required: 'Package is required',
+                  min: { value: 0.1, message: 'Package must be > 0' }
+                })}
+              />
+              {errors.packageLPA && <p className="text-xs text-red-500 mt-1">{errors.packageLPA.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Positions *</label>
-              <input type="number" min="1" value={form.positions || ""} onChange={e => update("positions", parseInt(e.target.value) || 0)} placeholder="e.g. 10"
-                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.positions ? "border-red-300" : "border-gray-200"}`} />
-              {errors.positions && <p className="text-xs text-red-500 mt-1">{errors.positions}</p>}
+              <input
+                type="number" min="1" placeholder="e.g. 10"
+                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.positions ? "border-red-300" : "border-gray-200"}`}
+                {...register('positions', {
+                  required: 'Positions is required',
+                  min: { value: 1, message: 'Positions must be > 0' }
+                })}
+              />
+              {errors.positions && <p className="text-xs text-red-500 mt-1">{errors.positions.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Min CGPA *</label>
-              <input type="number" min="0" max="10" step="0.1" value={form.minCGPA || ""} onChange={e => update("minCGPA", parseFloat(e.target.value) || 0)} placeholder="e.g. 7.5"
-                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.minCGPA ? "border-red-300" : "border-gray-200"}`} />
-              {errors.minCGPA && <p className="text-xs text-red-500 mt-1">{errors.minCGPA}</p>}
+              <input
+                type="number" min="0" max="10" step="0.1" placeholder="e.g. 7.5"
+                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.minCGPA ? "border-red-300" : "border-gray-200"}`}
+                {...register('minCGPA', {
+                  required: 'Min CGPA is required',
+                  min: { value: 0,  message: 'Min CGPA is 0'  },
+                  max: { value: 10, message: 'Max CGPA is 10' }
+                })}
+              />
+              {errors.minCGPA && <p className="text-xs text-red-500 mt-1">{errors.minCGPA.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Deadline *</label>
-              <input type="date" value={form.deadline} onChange={e => update("deadline", e.target.value)}
-                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.deadline ? "border-red-300" : "border-gray-200"}`} />
-              {errors.deadline && <p className="text-xs text-red-500 mt-1">{errors.deadline}</p>}
+              <input
+                type="date"
+                className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.deadline ? "border-red-300" : "border-gray-200"}`}
+                {...register('deadline', { required: 'Deadline is required' })}
+              />
+              {errors.deadline && <p className="text-xs text-red-500 mt-1">{errors.deadline.message}</p>}
             </div>
           </div>
 
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Company Description</label>
-            <textarea value={form.description} onChange={e => update("description", e.target.value)} placeholder="Brief company overview..." rows={3}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+            <textarea
+              placeholder="Brief company overview..."
+              rows={3}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              {...register('description')}
+            />
           </div>
 
-          {/* Requirements */}
+          {/* Requirements — still useState, RHF not ideal for dynamic lists */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Requirements</label>
             <div className="flex gap-2 mb-2">
-              <input value={reqInput} onChange={e => setReqInput(e.target.value)}
+              <input
+                value={reqInput}
+                onChange={e => setReqInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addReq() } }}
                 placeholder="Add a requirement and press Enter"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
               <button type="button" onClick={addReq} className="px-4 py-2.5 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
-            {form.requirements.length > 0 && (
+            {requirements.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {form.requirements.map(r => (
+                {requirements.map(r => (
                   <span key={r} className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-full text-xs font-medium">
                     {r}
                     <button type="button" onClick={() => removeReq(r)} className="text-blue-400 hover:text-red-500 transition-colors">
@@ -188,11 +257,14 @@ function CompanyFormModal({ initial, onSave, onClose }) {
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-all text-sm">Cancel</button>
+            <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-all text-sm">
+              Cancel
+            </button>
             <button type="submit" className="flex-1 flex items-center justify-center gap-2 bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-800 transition-all shadow-md shadow-blue-200 text-sm">
               <Save className="w-4 h-4" /> {initial ? "Save Changes" : "Add Company"}
             </button>
           </div>
+
         </form>
       </div>
     </div>
