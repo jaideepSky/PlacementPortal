@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import StudentDashboard from './pages/student/StudentDashboard';
 import CompanyManagement from './pages/admin/CompanyManagement';
+import StudentApplicationManagement from './pages/admin/StudentApplicationManagement';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +43,11 @@ const router = createBrowserRouter([
       {
         path:'/admin/companies',
         element: <CompanyManagement/>,
+      },
+      {
+        path:'/admin/students',
+        element:<StudentApplicationManagement/>
+
       }
     ]
   },

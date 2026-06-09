@@ -30,12 +30,12 @@ const applicationSlice = createSlice({
             }
         },
         // Admin updates application status
-        updateApplicationStatus : (state,action)=>{
-            const {id , status} = action.payload;
+        updateStatus : (state,action)=>{
+            const {id , status , round} = action.payload;
             const index = state.applicationsList.findIndex((application)=>application.id === id)
             if(index !== -1){
                 state.applicationsList[index].status = status; // Update the status of the application
-                
+                state.applicationsList[index].round = round; // Update the round of the application
             }
         },
          // CLEAR ERROR
@@ -46,4 +46,4 @@ const applicationSlice = createSlice({
 })
 
 export default applicationSlice.reducer;
-export const { applyToCompany, updateApplicationStatus, clearError } = applicationSlice.actions;
+export const { applyToCompany, updateStatus, clearError } = applicationSlice.actions;
