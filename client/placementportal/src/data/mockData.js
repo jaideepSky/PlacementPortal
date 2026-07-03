@@ -290,7 +290,7 @@ export const mockStudents = [
     year: "4th Year",
     cgpa: 8.7,
     phone: "9876543210",
-    skills: ["React", "Node.js", "Python", "SQL"],
+    skills: [],
     about:
       "Passionate full-stack developer with experience in web and mobile development.",
     linkedin: "linkedin.com/in/aryan",
@@ -386,5 +386,6 @@ export const mockUsers = [
     email:    'aryan@college.edu',
     password: 'student123',   // ← add password here
     role:     'student',
-  },
+    
+  }
 ]
