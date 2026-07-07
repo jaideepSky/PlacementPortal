@@ -16,6 +16,8 @@ import StudentApplicationManagement from "./pages/admin/StudentApplicationManage
 import StudentProfile from "./pages/student/StudentProfile";
 import Student from "./pages/student/Student";
 import Admin from "./pages/admin/Admin";
+import ApplicationStatus from "./pages/student/ApplicationStatus";
+import CompanyListings from "./pages/student/CompanyListing";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -67,6 +69,14 @@ const router = createBrowserRouter([
         path: "profile",
         element: <StudentProfile />,
       },
+      {
+        path: "applications",
+        element : <ApplicationStatus/>
+      },
+      {
+        path : "companies",
+        element : <CompanyListings/>
+      }
         ]
       },
 
