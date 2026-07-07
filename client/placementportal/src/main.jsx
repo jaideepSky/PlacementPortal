@@ -18,6 +18,7 @@ import Student from "./pages/student/Student";
 import Admin from "./pages/admin/Admin";
 import ApplicationStatus from "./pages/student/ApplicationStatus";
 import CompanyListings from "./pages/student/CompanyListing";
+import ProtectedRoute from "./components/ProtectedRoute";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -35,52 +36,59 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
-      {
+     {
+      element:<ProtectedRoute allowedRoles={["admin"]}/>,
+      children :[
+         {
         path: "admin",
         element: <Admin />,
         children: [
           {
-        path: "dashboard",
-        element: <AdminDashboard />,
-      },
+            path: "dashboard",
+            element: <AdminDashboard />,
+          },
 
-      {
-        path: "companies",
-        element: <CompanyManagement />,
+          {
+            path: "companies",
+            element: <CompanyManagement />,
+          },
+          {
+            path: "students",
+            element: <StudentApplicationManagement />,
+          },
+        ],
       },
-      {
-        path: "students",
-        element: <StudentApplicationManagement />,
-      },
-        ]
-        
-      },
+      ]
+     },
+{
+element:<ProtectedRoute allowedRoles={["student"]}/>,
+children:[
+   {
+        path: "/student",
+        element: <Student />,
+        children: [
+          {
+            path: "dashboard",
+            element: <StudentDashboard />,
+          },
 
-      {
-        path : '/student',
-        element : <Student/>,
-        children : [
-            {
-        path: "dashboard",
-        element: <StudentDashboard />,
+          {
+            path: "profile",
+            element: <StudentProfile />,
+          },
+          {
+            path: "applications",
+            element: <ApplicationStatus />,
+          },
+          {
+            path: "companies",
+            element: <CompanyListings />,
+          },
+        ],
       },
+]
+}
      
-      {
-        path: "profile",
-        element: <StudentProfile />,
-      },
-      {
-        path: "applications",
-        element : <ApplicationStatus/>
-      },
-      {
-        path : "companies",
-        element : <CompanyListings/>
-      }
-        ]
-      },
-
-    
     ],
   },
 ]);
