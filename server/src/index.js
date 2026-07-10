@@ -2,7 +2,7 @@ import express from  'express'
 import dotenv from 'dotenv';
 import connect_DB from './config/db.js';
 import { app } from './app.js';
-import userRoute from './routes/user.route.js'
+import authRoute from './routes/auth.route.js'
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ dotenv.config();
 app.get('/',(req,res)=>{
     res.send("hello placement-portal!!")
 })
-app.use('/api/v1/user',userRoute )
+app.use('/api/v1/auth',authRoute )
 
 
 
