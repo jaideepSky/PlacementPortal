@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connect_DB from './config/db.js';
 import { app } from './app.js';
 import authRoute from './routes/auth.route.js'
+import studentRoute from './routes/studentProfile.route.js'
 
 dotenv.config();
 
@@ -10,8 +11,11 @@ dotenv.config();
 app.get('/',(req,res)=>{
     res.send("hello placement-portal!!")
 })
-app.use('/api/v1/auth',authRoute )
+//*Auth Route
+app.use('/api/auth',authRoute )
 
+// * Student Profile Route
+app.use('/api/student',studentRoute)
 
 
 // *Connect DB 

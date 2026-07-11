@@ -12,7 +12,7 @@ export const isLoggedIn = async (req , res , next)=>{
             message:"Authentication Failed"
         }) 
      }
-    const decoded =  jwt.verify(token,process.env. JWT_SECRET)
+    const decoded =  jwt.verify(token,process.env.JWT_SECRET)
     console.log("Decoded data :",decoded);
     req.user = decoded
     next()
