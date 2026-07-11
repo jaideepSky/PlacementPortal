@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-export const isLoggedIn = async (req , res , next)=>{
+ const isLoggedIn = async (req , res , next)=>{
 
    try {
      console.log(req.cookies)
@@ -25,3 +25,5 @@ export const isLoggedIn = async (req , res , next)=>{
    }
 
 }
+
+export {isLoggedIn}
