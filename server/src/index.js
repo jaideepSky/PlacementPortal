@@ -4,6 +4,7 @@ import connect_DB from './config/db.js';
 import { app } from './app.js';
 import authRoute from './routes/auth.route.js'
 import studentRoute from './routes/studentProfile.route.js'
+import companyRoute from './routes/company.route.js'
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.use('/api/auth',authRoute )
 
 // * Student Profile Route
 app.use('/api/student',studentRoute)
+
+// * Company Route
+app.use('/api/company',companyRoute)
 
 
 // *Connect DB 

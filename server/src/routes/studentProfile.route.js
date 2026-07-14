@@ -6,6 +6,6 @@ import authorise from '../middlewares/authorise.midlleware.js'
 const router = express.Router()
 
 router.get('/profile', isLoggedIn , authorise('student') , getProfile)
-router.put('/profile',updateProfile)
+router.patch('/profile', isLoggedIn , authorise('student') ,updateProfile)
 
 export default router
