@@ -4,7 +4,6 @@ const companySchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-     
     },
     name: {
       type: String,
@@ -52,6 +51,13 @@ const companySchema = new mongoose.Schema(
     jobRole: {
       type: String,
       required: true,
+    },
+    eligibleBranches: {
+      type: [
+        {
+          type: String,
+        },
+      ],
     },
     requirements: {
       type: [

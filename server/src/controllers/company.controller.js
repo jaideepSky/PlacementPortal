@@ -196,11 +196,17 @@ try {
     const company = await Company.findById(id)
      if (!company) {
       return res.status(404).json({
-        success: false,
+        
         message: "Company not found",
       });
     }
     await company.deleteOne()
+    return res.status(201).json({
+      success:true,
+      message: "Company remove successfully",
+      
+
+    })
 
     
 } catch (error) {
