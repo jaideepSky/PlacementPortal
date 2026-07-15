@@ -25,24 +25,6 @@ const registerUser = async (req, res) => {
   const existingUser = await User.findOne({ email });
   const existingStudent = await Student.findOne({rollNo})
 
- 
-
-  
-    if (
-      !name ||
-      !email ||
-      !password ||
-      !rollNo ||
-      !department ||
-      !year ||
-      !cgpa ||
-      !phone
-    ) {
-      return res.status(404).json({
-        message: "All fields are required",
-      }); // return error
-    }
-
   if (existingUser) {
     return res.status(400).json({
       message: "User already exists !!",
@@ -55,11 +37,6 @@ const registerUser = async (req, res) => {
     });
   }
 
-  if (password !== confirmPassword) {
-    return res.status(400).json({
-      message: "Passwords do not match",
-    });
-  }
   try {
    
    
@@ -114,11 +91,7 @@ const registerUser = async (req, res) => {
 // *Login
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(404).json({
-      message: "All fields are required",
-    });
-  }
+  
 
   try {
     const user = await User.findOne({ email });

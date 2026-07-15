@@ -148,19 +148,7 @@ const updateApplication = async (req,res)=>{
         success: false,
       });
    }
-  const validStatus = [
-    "Applied",
-    "Shortlisted",
-    "Rejected",
-    "Selected"
-];
-
-if (!validStatus.includes(status)) {
-    return res.status(400).json({
-        success: false,
-        message: "Invalid status"
-    });
-}
+ 
    application.status = status;
     await application.save();
 

@@ -16,24 +16,7 @@ const createCompany = async (req, res) => {
     requirements,
   } = req.body;
 
-  if (
-    !name ||
-    !logo ||
-    !industry ||
-    !status ||
-    !jobRole ||
-    !location ||
-    !packageLPA ||
-    !positions ||
-    !minCGPA ||
-    !deadline ||
-    !description ||
-    !requirements
-  ) {
-    return res.status(400).json({
-      message: "All fields are required",
-    });
-  }
+
   try {
     const existingCompany = await Company.findOne({ name });
     if (existingCompany) {
