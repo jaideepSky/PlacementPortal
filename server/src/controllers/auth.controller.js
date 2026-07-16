@@ -4,6 +4,10 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import session from "express-session";
 dotenv.config({
   path: "../.env",
 });
@@ -21,27 +25,25 @@ const registerUser = async (req, res) => {
     cgpa,
     phone,
   } = req.body;
+  console.log(req.body)
 
   const existingUser = await User.findOne({ email });
   const existingStudent = await Student.findOne({rollNo})
 
   if (existingUser) {
-    return res.status(400).json({
-      message: "User already exists !!",
-    });
+   throw new ApiError(400,"User already exists")
   }
 
    if (existingStudent) {
-    return res.status(400).json({
-      message: "Student already exists !!",
-    });
+   throw new ApiError(400 , "Student already exists")
   }
 
+  let session
   try {
    
    
 
-    const session = await mongoose.startSession()
+   session = await mongoose.startSession()
     session.startTransaction()
      const user = await User.create([{ name, email, password }],{session});
       const student = await Student.create([{
@@ -58,28 +60,27 @@ const registerUser = async (req, res) => {
 
 
     if (!user) {
-      return res.status(400).json({
-        message: "User not registered",
-      });
+     throw new ApiError(400 ,"User not registered")
     }
     if (!student) {
-      return res.status(400).json({
-        message: "User not registered",
-      });
+      throw new ApiError(400 ,"Student not registered")
     }
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      data: {
-        user:user,
-        student : student
-      },
-
-    });
+    res.status(201).json(
+       new ApiResponse(
+        201,
+        {
+            user: user,
+            student: student
+        },
+        "User registered successfully"
+    )
+    );
 
     console.log(user);
   } catch (error) {
-    await session.abortTransaction();
+     if (session) {
+      await session.abortTransaction();
+    }
     res.status(500).json({
       success: false,
       message: "error in signing up!!",
@@ -89,23 +90,16 @@ const registerUser = async (req, res) => {
 };
 
 // *Login
-const loginUser = async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  
-
-  try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({
-        message: "Invalide email or password",
-      });
+      throw new ApiError(401 ,"Invalide email or password")
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({
-        message: "Invalide email or password",
-      });
+      throw new ApiError(401 ,"Invalide email or password")
     }
 
     const token = jwt.sign(
@@ -120,32 +114,18 @@ const loginUser = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     };
     res.cookie("token", token, cookieOption);
-    res.status(200).json({
-      success: true,
-      message: "Login Successfull",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-      },
-    });
+    res.status(200).json(
+      ApiResponse(200,token,"Login Successfully")
+    );
     console.log(user);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "error  in login!!",
-      error: error.message,
-    });
-  }
-};
+  
+})
 
-const logoutUser = async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
   res.cookie("token", "", {});
-  return res.status(200).json({
-    success: true,
-    message: "Logout Successfully",
-  });
-};
+  return res.status(200).json(
+    ApiResponse(200 , "Logout Successfully")
+  );
+})
 
 export { registerUser, loginUser, logoutUser };

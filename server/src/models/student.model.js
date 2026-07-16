@@ -43,12 +43,12 @@ const studentSchema = new mongoose.Schema(
     },
     linkedin: {
       type: String,
-      required: true,
+      
     
     },
     github: {
       type: String,
-      required: true,
+      
     
     },
   },
