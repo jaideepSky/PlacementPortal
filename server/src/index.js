@@ -6,6 +6,7 @@ import authRoute from './routes/auth.route.js'
 import studentRoute from './routes/studentProfile.route.js'
 import companyRoute from './routes/company.route.js'
 import applicationRoute from './routes/application.route.js'
+import { errorHandler } from './middlewares/globalError.middleware.js';
 
 dotenv.config();
 
@@ -24,6 +25,8 @@ app.use('/api/company',companyRoute)
 
 // *Application Route
 app.use('/api/application',applicationRoute)
+
+app.use(errorHandler)
 
 
 // *Connect DB 
