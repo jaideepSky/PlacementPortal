@@ -8,6 +8,7 @@ import companyRoute from './routes/company.route.js'
 import applicationRoute from './routes/application.route.js'
 import { errorHandler } from './middlewares/globalError.middleware.js';
 import dashboardRoute from './routes/dashboard.route.js'
+import uploadResumeRoute from './routes/uplodResume.route.js'
 
 dotenv.config();
 
@@ -29,6 +30,9 @@ app.use('/api/application',applicationRoute)
 
 // *Dashboard Route
 app.use('/api',dashboardRoute)
+
+// *upload resume
+app.use('/api/student', uploadResumeRoute)
 
 app.use(errorHandler)
 

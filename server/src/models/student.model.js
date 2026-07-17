@@ -51,6 +51,16 @@ const studentSchema = new mongoose.Schema(
       
     
     },
+    resume: {
+    url: {
+        type: String,
+        default: ""
+    },
+    publicId: {
+        type: String,
+        default: ""
+    }
+}
   },
   { timestamps: true }
 );

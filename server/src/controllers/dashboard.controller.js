@@ -78,8 +78,8 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     })
     .sort({ createdAt: -1 })
     .limit(8);
-});
-return res.status(200).json(
+
+     return res.status(200).json(
     new ApiResponse(
         200,
         {
@@ -95,4 +95,8 @@ return res.status(200).json(
         "Dashboard data fetched successfully"
     )
 );
+}
+
+);
+
 export { getStudentDashboard, getAdminDashboard };
