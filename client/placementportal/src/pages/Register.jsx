@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { clearError, register } from "../redux/slices/authSlice";
+1;
+import { useRegisterMutation } from "../hooks/useAuth.js";
 
 const departments = [
   "Computer Science",
@@ -26,12 +27,13 @@ const departments = [
   "Chemical",
 ];
 
-const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+const years = [1, 2, 3, 4];
 
 function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { userdata, loading, error } = useSelector((state) => state.auth);
+  const { mutate, isPending  } = useRegisterMutation();
+  const { user , loading} = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -49,14 +51,13 @@ function Register() {
       year: "",
       cgpa: "",
       phone: "",
-    }
+    },
   });
   const [showPass, setShowPass] = useState(false);
   const [step, setStep] = useState(1); // initial step 1
   const password = watch("password"); // ← watch password for confirm match
 
   const handleStep1 = async () => {
-    dispatch(clearError());
     const valid = await trigger(["name", "email", "password"]);
     if (valid) {
       setStep(2);
@@ -64,16 +65,10 @@ function Register() {
   };
 
   const onSubmit = (data) => {
-    dispatch(clearError());
-    dispatch(
-      register({ name: data.name, email: data.email, password: data.password }),
-    );
+    mutate(data);
   };
 
-  // redirect after register
-  if (userdata) {
-    navigate("/student/dashboard");
-  }
+ 
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">

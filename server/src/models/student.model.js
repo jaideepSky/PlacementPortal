@@ -5,7 +5,6 @@ const studentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-     
     },
     rollNo: {
       type: String,
@@ -14,7 +13,14 @@ const studentSchema = new mongoose.Schema(
     },
     department: {
       type: String,
-    enum: ["CSE", "IT", "ECE", "ME", "CE"],
+      enum: [
+        "Computer Science",
+        "Information Technology",
+        "Electronics",
+        "Mechanical",
+        "Civil",
+        "Chemical",
+      ],
       required: true,
     },
     year: {
@@ -32,35 +38,36 @@ const studentSchema = new mongoose.Schema(
       unique: true,
     },
     skills: {
-      type: [{
-        type:String
-      }],
+      type: [
+        {
+          type: String,
+        },
+      ],
       required: true,
     },
     about: {
       type: String,
-      unique: true,
+      default:""
+      
     },
     linkedin: {
       type: String,
-      
-    
+      default:""
     },
     github: {
       type: String,
-      
-    
+      default:""
     },
     resume: {
-    url: {
+      url: {
         type: String,
-        default: ""
+        default: "",
+      },
+      publicId: {
+        type: String,
+        default: "",
+      },
     },
-    publicId: {
-        type: String,
-        default: ""
-    }
-}
   },
   { timestamps: true }
 );
