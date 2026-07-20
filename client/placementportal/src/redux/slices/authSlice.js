@@ -3,32 +3,30 @@ import { mockUsers } from "../../data/mockData";
 
 const slice = createSlice({
     name:'auth',
-    initialState:{
-        
-       role : null, // student or admin
-       isAuthenticated : false,
-       user: null,
-       loading:false, 
-       error :null,
-    },
+    initialState: {
+  role: null,
+  user: null,
+  isAuthenticated: false,
+  authChecked: false,
+},
     reducers:{
         // SetUser action
-        setuser : (state,action)=>{
-            const {user} = action.payload;
-            state.role = user.role
-            state.isAuthenticated=true
-            state.user= user
-
-        },
+       setuser: (state, action) => {
+  const { user } = action.payload;
+  state.user = user;
+  state.role = user.role;
+  state.isAuthenticated = true;
+  state.authChecked = true;
+},
 
         
         // Logout action
-        logout : (state,action)=>{
-            state.user = null
-            state.role = null
-            state.isAuthenticated = false
-          
-        },
+       logout: (state) => {
+  state.user = null;
+  state.role = null;
+  state.isAuthenticated = false;
+  state.authChecked = true;
+},
          // CLEAR ERROR
     clearError: (state) => {
       state.error = null

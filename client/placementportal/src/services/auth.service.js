@@ -14,3 +14,10 @@ export const logoutUser = async() => {
     const response = api.post('/auth/logout')
     return (await response).data
 }
+
+
+
+export const getCurrentUser = async () => {
+    const response = await api.get("/auth/me");
+    return response.data;
+};

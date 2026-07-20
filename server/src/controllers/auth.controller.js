@@ -94,12 +94,12 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      throw new ApiError(401 ,"Invalide email or password")
+      throw new ApiError(401 ,"Invalid email or password")
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new ApiError(401 ,"Invalide email or password")
+      throw new ApiError(401 ,"Invalid email or password")
     }
 
     const token = jwt.sign(
@@ -108,14 +108,15 @@ const loginUser = asyncHandler(async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const cookieOption = {
-      httpOnly: true,
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    };
+   const cookieOption = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000,
+};
     res.cookie("token", token, cookieOption);
     return res.status(200).json(
-      ApiResponse(200,user,"Login Successfully")
+     new ApiResponse(200,{user:user},"Login Successfully")
     );
     console.log(user);
   
@@ -128,4 +129,14 @@ const logoutUser = asyncHandler(async (req, res) => {
   );
 })
 
-export { registerUser, loginUser, logoutUser };
+const getme = asyncHandler(async(req,res)=>{
+  const user = await User.findById(req.user.id)
+  if(!user){
+    throw new ApiError(404,"User not found")
+  }
+  return res.status(200).json(
+    new ApiResponse(200 , {user:user} ,"Current Student fetched Successfully" )
+  )
+})
+
+export { registerUser, loginUser, logoutUser , getme };

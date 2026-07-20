@@ -18,6 +18,8 @@ import { useForm } from "react-hook-form";
 1;
 import { useRegisterMutation } from "../hooks/useAuth.js";
 
+
+
 const departments = [
   "Computer Science",
   "Information Technology",
@@ -32,8 +34,9 @@ const years = [1, 2, 3, 4];
 function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { mutate, isPending  } = useRegisterMutation();
-  const { user , loading} = useSelector((state) => state.auth);
+  const { mutate, isPending , isError ,error   } = useRegisterMutation();
+
+  const { user } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -68,6 +71,7 @@ function Register() {
     mutate(data);
   };
 
+ 
  
 
   return (
@@ -386,12 +390,8 @@ function Register() {
                   )}
                 </div>
 
-                {/* Redux Error */}
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                    {error}
-                  </div>
-                )}
+              
+               
 
                 <div className="flex gap-3">
                   <button
@@ -403,10 +403,10 @@ function Register() {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isPending}
                     className="flex-1 flex items-center justify-center gap-2 bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-800 transition-all shadow-md shadow-blue-200 disabled:opacity-60"
                   >
-                    {loading ? (
+                    {isPending ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       "Create Account"

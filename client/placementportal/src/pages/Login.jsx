@@ -12,6 +12,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux"; // ← redux
+import { useLoginMutation } from "../hooks/useAuth.js";
 // import { login, clearError } from "../redux/slices/authSlice.js";
 
 
@@ -19,7 +20,8 @@ function Login() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error, loading , userdata} = useSelector((state) => state.auth);
+  const {mutate,isError,error,isPending} = useLoginMutation()
+  const { user} = useSelector((state) => state.auth);
   const [showPass, setShowPass] = useState(false);
   const [role, setRole] = useState("student");
   const { register, handleSubmit, setValue,formState:{errors} } = useForm({
@@ -27,20 +29,11 @@ function Login() {
   });
    
   const onSubmit = (data)=>{
-    dispatch(clearError())
-      dispatch(login({email:data.email , password:data.password })) // here loading handle in redux slice
+   
+     mutate(data)
   }
 
-   // redirect based on role from redux
-  if(userdata){
-    if(userdata.role == "admin"){
-      navigate("/admin/dashboard")
-    }
-      if(userdata.role == "student"){
-      navigate("/student/dashboard")
-    }
-    
-  }
+  
 
   // fill demo data
   const fillDemoData = (type)=>{
@@ -152,20 +145,15 @@ function Login() {
               )}
             </div>
 
-            {/* Redux Error */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                {error}
-              </div>
-            )}
-
+            
+      
             {/* Submit Button — loading from redux */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full flex items-center justify-center gap-2 bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-blue-200"
             >
-              {loading ? (
+              {isPending ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>Sign In <ArrowRight className="w-4 h-4" /></>

@@ -21,6 +21,8 @@ import CompanyListings from "./pages/student/CompanyListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./lib/queryclient";
+
+
 const router = createBrowserRouter([
   {
     path: "/",

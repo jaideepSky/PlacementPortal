@@ -35,7 +35,8 @@ const studentSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
-      unique: true,
+      unique:true,
+      default:""
     },
     skills: {
       type: [
