@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { useCurrentUser } from "../hooks/useAuth";
 
 function ProtectedRoute({ allowedRoles }) {
-  const { isLoading } = useCurrentUser();
+ 
   const { isAuthenticated, user, authChecked } = useSelector(
     (state) => state.auth,
   );
@@ -13,13 +13,7 @@ function ProtectedRoute({ allowedRoles }) {
     return <h3>Loading...</h3>;
   }
 
-  if (isLoading) {
-    return (
-      <>
-        <h3>Loading...</h3>
-      </>
-    );
-  }
+
 
   // check for login status
   if (!isAuthenticated) {

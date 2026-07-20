@@ -22,7 +22,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./lib/queryclient";
 
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -40,59 +39,58 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
-     {
-      element:<ProtectedRoute allowedRoles={["admin"]}/>,
-      children :[
-         {
-        path: "admin",
-        element: <Admin />,
+      {
+        element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
           {
-            path: "dashboard",
-            element: <AdminDashboard />,
-          },
+            path: "admin",
+            element: <Admin />,
+            children: [
+              {
+                path: "dashboard",
+                element: <AdminDashboard />,
+              },
 
-          {
-            path: "companies",
-            element: <CompanyManagement />,
-          },
-          {
-            path: "students",
-            element: <StudentApplicationManagement />,
+              {
+                path: "companies",
+                element: <CompanyManagement />,
+              },
+              {
+                path: "students",
+                element: <StudentApplicationManagement />,
+              },
+            ],
           },
         ],
       },
-      ]
-     },
-{
-element:<ProtectedRoute allowedRoles={["student"]}/>,
-children:[
-   {
-        path: "/student",
-        element: <Student />,
+      {
+        element: <ProtectedRoute allowedRoles={["student"]} />,
         children: [
           {
-            path: "dashboard",
-            element: <StudentDashboard />,
-          },
+            path: "/student",
+            element: <Student />,
+            children: [
+              {
+                path: "dashboard",
+                element: <StudentDashboard />,
+              },
 
-          {
-            path: "profile",
-            element: <StudentProfile />,
-          },
-          {
-            path: "applications",
-            element: <ApplicationStatus />,
-          },
-          {
-            path: "companies",
-            element: <CompanyListings />,
+              {
+                path: "profile",
+                element: <StudentProfile />,
+              },
+              {
+                path: "applications",
+                element: <ApplicationStatus />,
+              },
+              {
+                path: "companies",
+                element: <CompanyListings />,
+              },
+            ],
           },
         ],
       },
-]
-}
-     
     ],
   },
 ]);
@@ -100,7 +98,7 @@ children:[
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </Provider>,
 );

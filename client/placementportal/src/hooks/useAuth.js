@@ -46,9 +46,6 @@ export const useLoginMutation = () => {
   });
 };
 
-
-
-
 export const useCurrentUser = () => {
   const dispatch = useDispatch();
 
@@ -57,10 +54,10 @@ export const useCurrentUser = () => {
     queryFn: getCurrentUser,
     retry: false,
   });
-
+  
   useEffect(() => {
     if (query.data) {
-         console.log("Current User:", query.data);
+        //  console.log("Current User:", query.data);
       dispatch(setuser({ user: query.data.data.user }));
     }
   }, [query.data, dispatch]);
