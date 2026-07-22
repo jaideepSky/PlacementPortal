@@ -3,10 +3,10 @@ import Student from "../models/student.model.js";
 import Company from "../models/company.model.js";
 
 const applyCompany = async (req, res) => {
-  const { id } = req.params;
+  const { companyId } = req.params;
   try {
     const student = await Student.findOne({ user: req.user.id });
-    const company = await Company.findById(id);
+    const company = await Company.findById(companyId);
     if (!company) {
       return res.status(404).json({
         message: "Company not found",
@@ -56,7 +56,7 @@ const applyCompany = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Application submitted successfully",
-      data: applications,
+      data: application,
     });
   } catch (error) {
     return res.status(500).json({
@@ -78,10 +78,12 @@ const getApplication = async (req, res) => {
     }
     const applications = await Application.find({
       student: student._id,
-    }).populate("company");
+    }).populate("company").populate("student");
+
     if (applications.length === 0) {
-      return res.status(404).json({
+      return res.json({
         success: false,
+        data : [],
         message: "Applications not found",
       });
     }

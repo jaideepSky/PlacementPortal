@@ -7,7 +7,6 @@ import { companySchema } from '../validator/company.validator.js'
 const router = express.Router()
 router.post('/',validate(companySchema),isLoggedIn , authorise("admin"),createCompany)
 router.get('/', isLoggedIn , getAllCompany )
-router.get('/', isLoggedIn , getAllCompany )
 router.get('/:id' , isLoggedIn , getCompanyById)
 router.patch('/:id' ,validate(companySchema), isLoggedIn , authorise("admin") , updateCompany)
 router.patch('/:id' , isLoggedIn , authorise("admin") , deleteCompany)

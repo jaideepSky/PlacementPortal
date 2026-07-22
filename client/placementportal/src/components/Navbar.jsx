@@ -7,7 +7,7 @@ import { useSelector  , useDispatch} from "react-redux";
 import { logout } from "../redux/slices/authSlice.js";
 export function Navbar() {
     const dispatch = useDispatch();
-  const {userdata , isAuthenticated } = useSelector((state) => state.auth);
+  const {user , isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,14 +33,14 @@ export function Navbar() {
     { to: "/admin/students", label: "Students" },
   ];
 
-  const links = userdata?.role === "admin" ? adminLinks : userdata?.role === "student" ? studentLinks : [];
+  const links = user?.role === "admin" ? adminLinks : user?.role === "student" ? studentLinks : [];
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={userdata ? (userdata.role === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center gap-2">
+          <Link to={user ? (user.role === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg bg-blue-700 flex items-center justify-center">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
@@ -51,7 +51,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          {userdata && (
+          {user && (
             <div className="hidden md:flex items-center gap-1">
               {links.map((link) => (
                 <Link
@@ -71,7 +71,7 @@ export function Navbar() {
 
           {/* Right Side */}
           <div className="flex items-center gap-3">
-            {userdata ? (
+            {user ? (
               <>
                 <button className="relative p-2 text-gray-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                   <Bell className="w-5 h-5" />
@@ -83,21 +83,21 @@ export function Navbar() {
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-white text-sm font-semibold">
-                      {userdata.name.charAt(0)}
+                      {user.name.charAt(0)}
                     </div>
                     <div className="hidden sm:block text-left">
-                      <p className="text-sm font-medium text-gray-800 leading-tight">{userdata.name.split(" ")[0]}</p>
-                      <p className="text-xs text-gray-500 leading-tight capitalize">{userdata.role}</p>
+                      <p className="text-sm font-medium text-gray-800 leading-tight">{user.name.split(" ")[0]}</p>
+                      <p className="text-xs text-gray-500 leading-tight capitalize">{user.role}</p>
                     </div>
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                   </button>
                   {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-800">{userdata.name}</p>
-                        <p className="text-xs text-gray-500">{userdata.email}</p>
+                        <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
-                      {userdata.role === "student" && (
+                      {user.role === "student" && (
                         <Link
                           to="/student/profile"
                           className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -128,7 +128,7 @@ export function Navbar() {
             ) : null}
 
             {/* Mobile menu button */}
-            {userdata && (
+            {user && (
               <button
                 className="md:hidden p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-50 rounded-lg"
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -140,7 +140,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile Menu */}
-        {mobileOpen && userdata && (
+        {mobileOpen && user && (
           <div className="md:hidden border-t border-gray-100 py-2 space-y-1">
             {links.map((link) => (
               <Link

@@ -6,7 +6,7 @@ import { validate } from '../middlewares/validate.middleware.js'
 import { updateStatusSchema } from '../validator/application.validator.js'
 const router = express.Router()
 
-router.post('/apply/:companyId' ,isLoggedIn , authorise("student") ,applyCompany )
+router.post('/apply/:companyId' ,isLoggedIn , authorise("student") ,applyCompany)
 router.get('/my' ,isLoggedIn , authorise("student") ,getApplication )
 router.get('/company/:companyId' ,isLoggedIn , authorise("admin") ,getAllApplication )
 router.patch('/:applicationId/status' ,validate(updateStatusSchema),isLoggedIn , authorise("admin") ,updateApplication )

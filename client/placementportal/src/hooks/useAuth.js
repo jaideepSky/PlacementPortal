@@ -17,6 +17,7 @@ export const useRegisterMutation = () => {
       navigate("/login");
     },
     onError: (error) => {
+      console.log( error.response?.data)
      toast.error(
       error.response?.data?.message || "Something went wrong"
     );
@@ -54,6 +55,9 @@ export const useCurrentUser = () => {
     queryFn: getCurrentUser,
     retry: false,
   });
+   if (query.isError) {
+    console.error(query.error);
+  }
   
   useEffect(() => {
     if (query.data) {

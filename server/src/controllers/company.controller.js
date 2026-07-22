@@ -13,10 +13,13 @@ const createCompany = async (req, res) => {
     minCGPA,
     deadline,
     description,
+    eligibleBranches,
     requirements,
   } = req.body;
 
-
+ console.log(req.body);
+// console.log("eligibleBranches:", eligibleBranches);
+// console.log("Type:", typeof( eligibleBranches));
   try {
     const existingCompany = await Company.findOne({ name });
     if (existingCompany) {
@@ -24,6 +27,7 @@ const createCompany = async (req, res) => {
         message: "Company already exists",
       });
     }
+    
 
     const company = await Company.create({
       name,
@@ -37,9 +41,12 @@ const createCompany = async (req, res) => {
       minCGPA,
       deadline,
       description,
+      eligibleBranches,
       requirements,
       createdBy: req.user.id,
     });
+    // console.log(company);
+// console.log(company.eligibleBranches);
 
     return res.status(201).json({
       success: true,

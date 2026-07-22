@@ -26,6 +26,7 @@ export const companySchema = z.object({
     ]),
 
     jobRole: z.string(),
+     eligibleBranches: z.array(z.string()),
 
     requirements: z.array(z.string())
 });

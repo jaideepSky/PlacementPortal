@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
  const isLoggedIn = async (req , res , next)=>{
 
+     console.log(jwt.decode(req.cookies.token));
    try {
      console.log(req.cookies)
      let token = req.cookies?.token
@@ -18,6 +19,9 @@ import jwt from 'jsonwebtoken'
     next()
    } catch (error) {
         console.log("Auth  Middleware Error ");
+        console.log(error);
+    console.log(error.name);
+    console.log(error.message);
         return res.status(500).json({
             success:false,
             message:"Internal Server Error"

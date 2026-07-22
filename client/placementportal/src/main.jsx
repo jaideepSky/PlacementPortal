@@ -3,6 +3,7 @@ import "./index.css";
 
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider } from "react-redux";
 import App from "./App";
 import Home from "./pages/Home";
@@ -99,6 +100,7 @@ createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </Provider>,
 );

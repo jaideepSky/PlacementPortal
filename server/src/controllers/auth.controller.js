@@ -107,6 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    console.log(jwt.decode(token));
 
    const cookieOption = {
   httpOnly: true,

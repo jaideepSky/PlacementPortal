@@ -19,7 +19,7 @@ app.get('/',(req,res)=>{
 //*Auth Route
 app.use('/api/auth',authRoute )
 
-// * Student Profile Route
+// * Student Profile  Route
 app.use('/api/student',studentRoute)
 
 // * Company Route

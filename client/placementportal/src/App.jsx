@@ -2,6 +2,7 @@ import { Outlet } from "react-router"
 
 import { Toaster } from "react-hot-toast";
 import { useCurrentUser } from "./hooks/useAuth.js";
+import { Navbar } from "./components/Navbar.jsx";
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
         "bg-red-600 text-white rounded-lg shadow-lg px-4 py-3",
     },
   }}
-/>
+/>    
       <Outlet/>
     </>
   )
