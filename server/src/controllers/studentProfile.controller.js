@@ -26,14 +26,18 @@ const getProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const { phone, cgpa, skills, about, linkedin, github } = req.body;
+  const { phone, cgpa, skills, about, linkedin, github , name } = req.body;
 
   try {
-    const student = await Student.findOne({ user: req.user.id })
+    const student = await Student.findOne({ user: req.user.id }).populate("user")
     if (!student) {
       return res.status(404).json({
         message: "Student profile not found !!",
       });
+    }
+    if(name){
+      student.user.name= name
+       await student.user.save(); 
     }
 
     if (phone) {

@@ -1,38 +1,55 @@
 // src/pages/student/StudentProfile.jsx
-import { useState } from "react"
+import { useState , useEffect} from "react"
 import {
   User, Mail, Phone, Building, BookOpen, Star, Edit3, Save, X,
   Plus, Trash2, Linkedin, Github, FileText, MapPin, Award, CheckCircle
 } from "lucide-react"
 import { useSelector, useDispatch } from "react-redux"       // ← redux
-import {updateStudent} from '../../redux/slices/studentSlice.js' // ← redux
+
+import { useStudentProfile, useUpdateStudentProfile } from "../../hooks/useStudent.js"
 
 const SKILL_SUGGESTIONS = ["React", "Node.js", "Python", "Java", "C++", "SQL", "MongoDB", "AWS", "Docker", "Machine Learning", "TypeScript", "Angular", "Vue.js", "Spring Boot", "Django", "Flutter", "Kotlin", "Swift", "TensorFlow", "Kubernetes"]
 
 export default function StudentProfile() {
 
-  const dispatch               = useDispatch()
-  const { userdata }           = useSelector(state => state.auth)          // ← auth
-  const { studentsList }       = useSelector(state => state.students)      // ← students
 
-  // ← get full profile by matching id
-  const currentStudent = studentsList.find(s => s.id === userdata?.id)
-  console.log(currentStudent)
+
+   // ← get full student profile
+   const { data: currentStudent} = useStudentProfile();
+
+   const {mutate} = useUpdateStudentProfile()
+ 
 
   const [editing, setEditing] = useState(false)
   const [saved, setSaved]     = useState(false)
   const [newSkill, setNewSkill] = useState("")
 
   const [form, setForm] = useState({
-    name:     currentStudent?.name     || "",
-    phone:    currentStudent?.phone    || "",
-    address:  currentStudent?.address  || "",
-    about:    currentStudent?.about    || "",
-    linkedin: currentStudent?.linkedin || "",
-    github:   currentStudent?.github   || "",
-    skills:   currentStudent?.skills   || [],
-    cgpa:     currentStudent?.cgpa?.toString() || "",
-  })
+  name: "",
+  phone: "",
+  address: "",
+  about: "",
+  linkedin: "",
+  github: "",
+  skills: [],
+  cgpa: "",
+});
+
+
+useEffect(() => {
+  if (currentStudent?.data) {
+    setForm({
+      name: currentStudent.data.user.name || "",
+      phone: currentStudent.data.phone || "",
+      address: currentStudent.data.address || "",
+      about: currentStudent.data.about || "",
+      linkedin: currentStudent.data.linkedin || "",
+      github: currentStudent.data.github || "",
+      skills: currentStudent.data.skills || [],
+      cgpa: currentStudent.data.cgpa?.toString() || "",
+    });
+  }
+}, [currentStudent]);
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
@@ -48,18 +65,8 @@ export default function StudentProfile() {
 
   // ← dispatch updateStudent instead of setCurrentUser
   const handleSave = () => {
-    if (!currentStudent) return
-    dispatch(updateStudent({
-      id:       currentStudent.id,
-      name:     form.name,
-      phone:    form.phone,
-      address:  form.address,
-      about:    form.about,
-      linkedin: form.linkedin,
-      github:   form.github,
-      skills:   form.skills,
-      cgpa:     parseFloat(form.cgpa) || currentStudent.cgpa,
-    }))
+    if (!currentStudent?.data) return
+      mutate(form)
     setEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
@@ -138,7 +145,7 @@ export default function StudentProfile() {
             {/* Avatar Card */}
             <div className="bg-linear-to-br from-blue-700 to-indigo-700 rounded-2xl p-6 text-center text-white shadow-sm">
               <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold mx-auto mb-4">
-                {currentStudent?.name?.charAt(0)}
+                {currentStudent?.data?.user?.name?.charAt(0)}
               </div>
               {editing ? (
                 <input
@@ -147,10 +154,10 @@ export default function StudentProfile() {
                   className="w-full bg-white/20 rounded-xl px-3 py-2 text-white placeholder-white/60 text-center text-sm focus:outline-none focus:bg-white/30"
                 />
               ) : (
-                <h2 className="font-semibold text-lg">{currentStudent?.name}</h2>
+                <h2 className="font-semibold text-lg">{currentStudent?.data?.user?.name}</h2>
               )}
-              <p className="text-blue-200 text-sm mt-1">{currentStudent?.rollNo}</p>
-              <p className="text-blue-200 text-sm">{currentStudent?.department}</p>
+              <p className="text-blue-200 text-sm mt-1">{currentStudent?.data?.rollNo}</p>
+              <p className="text-blue-200 text-sm">{currentStudent?.data?.department}</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <div className="bg-white/10 rounded-xl p-2.5">
                   <p className="text-blue-200 text-xs">CGPA</p>
@@ -162,12 +169,12 @@ export default function StudentProfile() {
                       className="w-full bg-transparent text-white text-sm font-bold text-center focus:outline-none"
                     />
                   ) : (
-                    <p className="text-white font-bold text-sm">{currentStudent?.cgpa?.toFixed(1)}</p>
+                    <p className="text-white font-bold text-sm">{currentStudent?.data?.cgpa?.toFixed(1)}</p>
                   )}
                 </div>
                 <div className="bg-white/10 rounded-xl p-2.5">
                   <p className="text-blue-200 text-xs">Year</p>
-                  <p className="text-white font-bold text-sm">{currentStudent?.year}</p>
+                  <p className="text-white font-bold text-sm">{currentStudent?.data?.year}</p>
                 </div>
               </div>
             </div>
@@ -177,7 +184,7 @@ export default function StudentProfile() {
               <h3 className="font-semibold text-gray-800 text-sm">Contact Information</h3>
               <div className="space-y-3">
                 {[
-                  { icon: Mail,  label: "Email",   value: userdata?.email, key: null      },  // ← from auth
+                  { icon: Mail,  label: "Email",   value: currentStudent?.data?.user?.email, key: null },  
                   { icon: Phone, label: "Phone",   value: form.phone,      key: "phone"   },
                   { icon: MapPin, label: "Address", value: form.address,   key: "address" },
                 ].map(item => (
@@ -260,10 +267,10 @@ export default function StudentProfile() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: "Department",   value: currentStudent?.department,       icon: Building  },
-                  { label: "Year",         value: currentStudent?.year,             icon: BookOpen  },
-                  { label: "Roll Number",  value: currentStudent?.rollNo,           icon: FileText  },
-                  { label: "CGPA",         value: currentStudent?.cgpa?.toFixed(2), icon: Award     },
+                  { label: "Department",   value: currentStudent?.data?.department,       icon: Building  },
+                  { label: "Year",         value: currentStudent?.data?.year,             icon: BookOpen  },
+                  { label: "Roll Number",  value: currentStudent?.data?.rollNo,           icon: FileText  },
+                  { label: "CGPA",         value: currentStudent?.data?.cgpa?.toFixed(2), icon: Award     },
                 ].map(item => (
                   <div key={item.label} className="bg-gray-50 rounded-xl p-3.5 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">

@@ -7,6 +7,8 @@ import {
   AlertCircle, Star, X
 } from "lucide-react"
 import { useSelector } from "react-redux"   // ← redux
+import { useStudentProfile } from "../../hooks/useStudent.js"
+import { useLoggedInStudentApplications } from "../../hooks/useApplication.js"
 
 const STATUS_CONFIG = {
   "Applied":             { color: "#3b82f6", bg: "bg-blue-50",   border: "border-blue-100",   icon: <Clock className="w-4 h-4" />,       step: 1 },
@@ -56,33 +58,34 @@ function PipelineBar({ status }) {
 // ── Main Component ────────────────────────────────────────────
 export default function ApplicationStatus() {
 
-  // ← redux instead of useApp()
-  const { userdata }                       = useSelector(state => state.auth)
-  const { applicationsList: applications } = useSelector(state => state.applications)
+   // ← get full student profile
+   const { data: currentStudentData} = useStudentProfile();
 
-  // filter only this student's applications
-  const myApps = applications.filter(a => a.studentId === userdata?.id)
+   // get loggedin student applications
+    const { data: applicationsData } = useLoggedInStudentApplications();
+    const applications = applicationsData?.data ?? [];
+    
 
   const [search, setSearch]         = useState("")
   const [statusFilter, setStatusFilter] = useState("All")
   const [selected, setSelected]     = useState(null)
 
-  const statusCounts = myApps.reduce((acc, a) => {
+  const statusCounts = applications.reduce((acc, a) => {
     acc[a.status] = (acc[a.status] || 0) + 1
     return acc
   }, {})
 
-  const filtered = [...myApps]
+  const filtered = [...applications]
     .filter(a => {
-      const matchSearch = a.companyName.toLowerCase().includes(search.toLowerCase()) ||
-                          a.jobRole.toLowerCase().includes(search.toLowerCase())
+      const matchSearch = a.company.name.toLowerCase().includes(search.toLowerCase()) ||
+                          a.company.jobRole.toLowerCase().includes(search.toLowerCase())
       const matchStatus = statusFilter === "All" || a.status === statusFilter
       return matchSearch && matchStatus
     })
     .sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
 
   const summaryCards = [
-    { label: "Total Applied",        value: myApps.length,                        bg: "bg-blue-50",   iconBg: "bg-blue-100",   text: "text-blue-700",   icon: Briefcase  },
+    { label: "Total Applied",        value: applications.length,                        bg: "bg-blue-50",   iconBg: "bg-blue-100",   text: "text-blue-700",   icon: Briefcase  },
     { label: "Shortlisted",          value: statusCounts["Shortlisted"]        || 0, bg: "bg-amber-50",  iconBg: "bg-amber-100",  text: "text-amber-700",  icon: TrendingUp },
     { label: "Interview Scheduled",  value: statusCounts["Interview Scheduled"] || 0, bg: "bg-purple-50", iconBg: "bg-purple-100", text: "text-purple-700", icon: Calendar   },
     { label: "Selected",             value: statusCounts["Selected"]           || 0, bg: "bg-green-50",  iconBg: "bg-green-100",  text: "text-green-700",  icon: CheckCircle },
@@ -161,16 +164,16 @@ export default function ApplicationStatus() {
           <div className="space-y-4">
             {filtered.map(app => {
               const cfg      = STATUS_CONFIG[app.status]
-              const gradient = COMPANY_COLORS[app.companyName] || "from-blue-400 to-blue-600"
+              const gradient = COMPANY_COLORS[app.company.name] || "from-blue-400 to-blue-600"
               return (
-                <div key={app.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all">
+                <div key={app._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all">
                   <div className={`h-1.5 bg-linear-to-r ${gradient}`} />
                   <div className="p-5">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
 
                       {/* Company Logo */}
                       <div className={`w-14 h-14 rounded-2xl bg-linear-to-br ${gradient} flex items-center justify-center text-white font-bold text-xl shadow-md shrink-0`}>
-                        {app.companyName.charAt(0)}
+                        {app.company.name.charAt(0)}
                       </div>
 
                       {/* Main Info */}
@@ -252,7 +255,7 @@ export default function ApplicationStatus() {
       {selected && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className={`h-20 bg-linear-to-r ${COMPANY_COLORS[selected.companyName] || "from-blue-400 to-blue-600"} relative`}>
+            <div className={`h-20 bg-linear-to-r mb-9 ${COMPANY_COLORS[selected.company.name] || "from-blue-400 to-blue-600"} relative`}>
               <button onClick={() => setSelected(null)}
                 className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
                 <X className="w-4 h-4" />
@@ -262,11 +265,11 @@ export default function ApplicationStatus() {
             <div className="px-6 pb-6">
               <div className="flex items-end gap-4 -mt-7 mb-5">
                 <div className={`w-14 h-14 rounded-2xl bg-linear-to-br ${COMPANY_COLORS[selected.companyName] || "from-blue-400 to-blue-600"} flex items-center justify-center text-white font-bold text-xl shadow-lg border-4 border-white`}>
-                  {selected.companyName.charAt(0)}
+                  {selected.company.name.charAt(0)}
                 </div>
-                <div className="pb-1">
-                  <h2 className="text-lg font-bold text-gray-900">{selected.companyName}</h2>
-                  <p className="text-sm text-gray-500">{selected.jobRole}</p>
+                <div className="pb-1 ">
+                  <h2 className="text-lg  font-bold text-gray-900">{selected.company.name}</h2>
+                  <p className="text-sm text-gray-500">{selected.company.jobRole}</p>
                 </div>
               </div>
 
@@ -287,11 +290,11 @@ export default function ApplicationStatus() {
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: "Job Role",     value: selected.jobRole                                          },
-                    { label: "Package",      value: `${selected.packageLPA} LPA`                             },
+                    { label: "Package",      value: `${selected.company.packageLPA} LPA`                             },
                     { label: "Status",       value: selected.status                                           },
                     { label: "Round",        value: selected.round || "N/A"                                   },
-                    { label: "Applied Date", value: new Date(selected.appliedDate).toLocaleDateString()       },
-                    { label: "Deadline",     value: selected.deadline ? new Date(selected.deadline).toLocaleDateString() : "N/A" },
+                    { label: "Applied Date", value: new Date(selected.createdAt).toLocaleDateString()       },
+                    { label: "Deadline",     value: selected.company.deadline ? new Date(selected.company.deadline).toLocaleDateString() : "N/A" },
                   ].map(item => (
                     <div key={item.label} className="bg-gray-50 rounded-xl p-3">
                       <p className="text-xs text-gray-400">{item.label}</p>

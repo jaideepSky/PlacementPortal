@@ -6,6 +6,9 @@ import {
 } from "lucide-react"
 import { useSelector } from "react-redux"   // ← redux
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { useStudentProfile } from "../../hooks/useStudent.js"
+import { useLoggedInStudentApplications } from "../../hooks/useApplication.js"
+import { useGetCompanies } from "../../hooks/useCompany.js"
 
 const STATUS_COLORS = {
   "Applied":             "#3b82f6",
@@ -26,19 +29,24 @@ const STATUS_ICONS = {
 export default function StudentDashboard() {
 
   
-  const { userdata }                       = useSelector(state => state.auth)
-  const {studentsList: students}               = useSelector(state => state.students)
-  const { applicationsList: applications } = useSelector(state => state.applications)
-  const { companiesList: companies }       = useSelector(state => state.companies)
-
-  const currentStudent = students.find((s)=>s.id === userdata?.id)
+  const { user } = useSelector(state => state.auth)
+  
+  
   
 
+  // ← get full student profile
+    const { data: currentStudent} = useStudentProfile();
+
+    // get loggedin student applications
+        const { data: applicationsData } = useLoggedInStudentApplications();
+        const myApps = applicationsData?.data ?? [];
   
-  // filter this student's applications
-  const myApps          = applications.filter(a => a.studentId === userdata?.id)
-  const activeCompanies = companies.filter(c => c.status === "Active")
-  const eligibleCompanies = activeCompanies.filter(c => (currentStudent?.cgpa || 0) >= c.minCGPA)
+    // get all companies
+  const { data: companiesData, isLoading } = useGetCompanies();
+   const companies = companiesData?.data ?? [];
+ 
+  const activeCompanies = companies.filter(c => c?.status === "Active")
+  const eligibleCompanies = activeCompanies.filter(c => (currentStudent?.data?.cgpa || 0) >= c.minCGPA)
 
   // pie chart data
   const statusCounts = myApps.reduce((acc, a) => {
@@ -54,7 +62,7 @@ export default function StudentDashboard() {
 
   // upcoming deadlines — companies student hasn't applied to yet
   const upcomingDeadlines = eligibleCompanies
-    .filter(c => !myApps.find(a => a.companyId === c.id))
+    .filter(c => !myApps.find(a => a.company._id === c._id))
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
     .slice(0, 3)
 
@@ -72,13 +80,13 @@ export default function StudentDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">
-            Good morning, {userdata?.name?.split(" ")[0]}! 👋  {/* ← userdata */}
+            Good morning, {currentStudent?.data?.user?.name?.split(" ")[0]}! 👋  
           </h1>
           <p className="text-gray-500 text-sm mt-1">Here's your placement activity overview</p>
         </div>
 
         {/* Profile Completion Banner */}
-        {!currentStudent?.skills?.length && (
+        {!currentStudent?.data?.skills?.length && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
@@ -154,20 +162,20 @@ export default function StudentDashboard() {
           <div className="bg-linear-to-br from-blue-700 to-indigo-700 rounded-2xl p-6 text-white shadow-sm">
             <div className="flex items-start gap-4 mb-5">
               <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-bold">
-                {userdata?.name?.charAt(0)}
+                {currentStudent?.data?.user?.name.charAt(0)}
               </div>
               <div>
-                <h2 className="font-semibold text-lg">{currentStudent?.name}</h2>
-                <p className="text-blue-200 text-sm">{currentStudent?.rollNo}</p>
-                <p className="text-blue-200 text-sm">{currentStudent?.department}</p>
+                <h2 className="font-semibold text-lg">{currentStudent?.data?.name}</h2>
+                <p className="text-blue-200 text-sm">{currentStudent?.data?.rollNo}</p>
+                <p className="text-blue-200 text-sm">{currentStudent?.data?.department}</p>
               </div>
-            </div>
+            </div>data?.
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: "CGPA",        value: currentStudent?.cgpa || "N/A" },
-                { label: "Department",  value: currentStudent?.department?.split(" ")[0] || "N/A" },
-                { label: "Eligible For", value: `${eligibleCompanies.length} cos` },
-                { label: "Applied To",  value: `${myApps.length} cos` },
+                { label: "CGPA",        value: currentStudent?.data?.cgpa || "N/A" },
+                { label: "Department",  value: currentStudent?.data?.department?.split(" ")[0] || "N/A" },
+                { label: "Eligible For", value: `${eligibleCompanies.length} company` },
+                { label: "Applied To",  value: `${myApps.length} company` },
               ].map(item => (
                 <div key={item.label} className="bg-white/10 rounded-xl p-3">
                   <p className="text-blue-200 text-xs">{item.label}</p>
@@ -218,7 +226,7 @@ export default function StudentDashboard() {
                 <div key={app.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
-                      {app.companyName.charAt(0)}
+                      {app?.company?.name.charAt(0)}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800">{app.companyName}</p>

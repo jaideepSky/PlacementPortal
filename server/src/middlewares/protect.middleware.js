@@ -18,14 +18,27 @@ import jwt from 'jsonwebtoken'
     req.user = decoded
     next()
    } catch (error) {
-        console.log("Auth  Middleware Error ");
-        console.log(error);
-    console.log(error.name);
-    console.log(error.message);
-        return res.status(500).json({
-            success:false,
-            message:"Internal Server Error"
-        }) 
+        console.error(error.name, error.message);
+        
+
+     if (error.name === "TokenExpiredError") {
+    return res.status(401).json({
+      success: false,
+      message: "Session expired. Please log in again.",
+    });
+  }
+
+  if (error.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token.",
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+  });
    }
 
 }
