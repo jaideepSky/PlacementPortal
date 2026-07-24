@@ -251,7 +251,7 @@ function AdminDashboard() {
                         <p className="text-gray-400 text-xs">{app?.company?.jobRole}</p>
                       </td>
                       <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
-                        {new Date(app.appliedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {new Date(app.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-4 py-3.5">
                         <span

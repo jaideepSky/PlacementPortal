@@ -841,13 +841,13 @@ export default function CompanyManagement() {
                             <div className="relative">
                               <button
                                 onClick={() =>
-                                  setMenuOpen(menuOpen === co.id ? null : co.id)
+                                  setMenuOpen(menuOpen === co._id ? null : co._id)
                                 }
                                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                               >
                                 <MoreVertical className="w-4 h-4" />
                               </button>
-                              {menuOpen === co.id && (
+                              {menuOpen === co._id && (
                                 <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20">
                                   <p className="px-3 py-1.5 text-xs text-gray-400 font-semibold uppercase tracking-wider">
                                     Change Status
