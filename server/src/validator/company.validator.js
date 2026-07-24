@@ -3,7 +3,7 @@ export const companySchema = z.object({
 
     name: z.string(),
 
-    logo: z.string().url(),
+    logo: z.string(),
 
     industry: z.string(),
 
@@ -30,3 +30,5 @@ export const companySchema = z.object({
 
     requirements: z.array(z.string())
 });
+
+export const updateCompanySchema = companySchema.partial();

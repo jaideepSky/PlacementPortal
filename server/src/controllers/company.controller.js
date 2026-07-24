@@ -1,3 +1,4 @@
+import Application from "../models/application.model.js";
 import Company from "../models/company.model.js";
 
 const createCompany = async (req, res) => {
@@ -117,6 +118,7 @@ const updateCompany = async (req, res) => {
     description,
     status,
     jobRole,
+    eligibleBranches,
     requirements
   } = req.body;
   try {
@@ -161,6 +163,9 @@ const updateCompany = async (req, res) => {
       if(jobRole){
         company.jobRole = jobRole
     }
+    if(eligibleBranches){
+        company.eligibleBranches = eligibleBranches
+    }
       if(requirements){
         company.requirements = requirements
     }
@@ -190,7 +195,19 @@ try {
         message: "Company not found",
       });
     }
-    await company.deleteOne()
+    const applicationExists = await Application.exists({
+    company: id
+});
+
+if (applicationExists) {
+    return res.status(400).json({
+        success: false,
+        message: "Cannot delete company because students have applied."
+    });
+}
+
+  await Company.findByIdAndDelete(req.params.id);
+   
     return res.status(201).json({
       success:true,
       message: "Company remove successfully",

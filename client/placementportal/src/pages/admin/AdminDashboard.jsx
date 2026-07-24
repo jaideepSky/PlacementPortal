@@ -10,6 +10,9 @@ import {
   PieChart, Pie, Cell, Legend
 } from "recharts"
 import { useSelector } from "react-redux"   // ← redux
+import { useAllApplicationsData, useAllStudentData } from '../../hooks/useAllData.js'
+import { useGetCompanies } from '../../hooks/useCompany.js'
+import { useAdminData } from '../../hooks/useAdminData.js'
 
 const STATUS_COLORS = {
   Applied:              "#3b82f6",
@@ -20,18 +23,35 @@ const STATUS_COLORS = {
 }
 function AdminDashboard() {
     const {userdata} = useSelector((state)=>state.auth)
-    const  {studentsList} = useSelector((state)=>state.students)
-    const  {applicationsList} = useSelector((state)=>state.applications)
-    const  {companiesList} = useSelector((state)=>state.companies)
 
+    // Get admin data
+
+    const {data:userData} = useAdminData()
+
+    // Get all Students // 
+    const {data:studentData} = useAllStudentData()
+      const studentsList = studentData?.data ?? []
+    
+       // Get all Application // 
+
+      const {data:applicationData} = useAllApplicationsData()
+        const applicationsList = applicationData?.data ?? []
+    
+      // get ALl companies
+      const { data: companiesData, isLoading } = useGetCompanies();
+      const companiesList = companiesData?.data ?? [];
+
+      // console.log(studentsList , applicationsList , companiesList , userData)
+      console.log(applicationsList)
+      // console.log(applicationData)
     // stats
     const totalStudents = studentsList.length
     const totalApplications = applicationsList.length
     const totalCompanies = companiesList.length
 
-    const activeCompanies = companiesList.filter((company)=>company.status === "active").length
-    const upcomingCompanies = companiesList.filter((company)=>company.status === "upcoming").length
-    const placedStudents =[... new Set( applicationsList.filter((app)=>app.status === "Selected").map((app)=>app.studentId))].length
+    const activeCompanies = companiesList.filter((company)=>company.status === "Active").length
+    const upcomingCompanies = companiesList.filter((company)=>company.status === "Upcoming").length
+    const placedStudents =[... new Set( applicationsList.filter((app)=>app.status === "Selected").map((app)=>app?.student?._id))].length
 
     // pie chart data
     const statusCounts = applicationsList.reduce((acc,currApp)=>{
@@ -47,7 +67,7 @@ function AdminDashboard() {
     const dept = s.department.split(' ')[0]
     if (!acc[dept]) acc[dept] = { dept, placed: 0, total: 0 }
     acc[dept].total += 1
-    const isPlaced = applicationsList.some(a => a.studentId === s.id && a.status === 'Selected')
+    const isPlaced = applicationsList.some(a => a?.student?._id === s._id && a.status === 'Selected')
     if (isPlaced) acc[dept].placed += 1
     return acc
   }, {})
@@ -55,8 +75,9 @@ function AdminDashboard() {
 
   // recent applications
   const recentApps = [...applicationsList]
-    .sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 8)
+    // console.log(recentApps)
 
     const placementRate = totalStudents > 0
     ? ( Math.round((placedStudents / totalStudents) * 100))
@@ -89,7 +110,7 @@ function AdminDashboard() {
               JMIT Placement Cell — Admin 👋
             </h1>
             <p className="text-gray-500 text-sm mt-1">
-              Welcome back, {userdata?.name}. Here's the JMIT placement overview.  {/* ← from redux */}
+              Welcome back, {userdata?.data?.name}. Here's the JMIT placement overview.  {/* ← from redux */}
             </p>
           </div>
           <div className="flex gap-3">
@@ -213,21 +234,21 @@ function AdminDashboard() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {recentApps.map((app) => (
-                    <tr key={app.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={app._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs shrink-0">
-                            {app.studentName.charAt(0)}
+                            {app?.student?.user?.name?.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium text-gray-800 text-xs">{app.studentName}</p>
-                            <p className="text-gray-400 text-xs">{app.studentRoll}</p>
+                            <p className="font-medium text-gray-800 text-xs">{app?.student?.user?.name}</p>
+                            <p className="text-gray-400 text-xs">{app?.student?.rollNo}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3.5">
-                        <p className="font-medium text-gray-800 text-xs">{app.companyName}</p>
-                        <p className="text-gray-400 text-xs">{app.jobRole}</p>
+                        <p className="font-medium text-gray-800 text-xs">{app?.company?.name}</p>
+                        <p className="text-gray-400 text-xs">{app?.company?.jobRole}</p>
                       </td>
                       <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
                         {new Date(app.appliedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}

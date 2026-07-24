@@ -289,7 +289,7 @@ export default function ApplicationStatus() {
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: "Job Role",     value: selected.jobRole                                          },
+                    { label: "Job Role",     value: selected.company.jobRole                                          },
                     { label: "Package",      value: `${selected.company.packageLPA} LPA`                             },
                     { label: "Status",       value: selected.status                                           },
                     { label: "Round",        value: selected.round || "N/A"                                   },

@@ -9,6 +9,8 @@ import applicationRoute from './routes/application.route.js'
 import { errorHandler } from './middlewares/globalError.middleware.js';
 import dashboardRoute from './routes/dashboard.route.js'
 import uploadResumeRoute from './routes/uplodResume.route.js'
+import getAllDataRoute from './routes/getAllData.route.js'
+import adminProfileRoute from './routes/adminProfile.route.js'
 
 dotenv.config();
 
@@ -22,6 +24,9 @@ app.use('/api/auth',authRoute )
 // * Student Profile  Route
 app.use('/api/student',studentRoute)
 
+// *Admin Profile
+app.use('/api',adminProfileRoute)
+
 // * Company Route
 app.use('/api/company',companyRoute)
 
@@ -30,6 +35,10 @@ app.use('/api/application',applicationRoute)
 
 // *Dashboard Route
 app.use('/api',dashboardRoute)
+
+// *GetALlData Route
+app.use('/api',getAllDataRoute)
+
 
 // *upload resume
 app.use('/api/student', uploadResumeRoute)
