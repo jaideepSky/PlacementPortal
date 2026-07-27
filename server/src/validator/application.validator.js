@@ -5,6 +5,7 @@ export const updateStatusSchema = z.object({
         "Applied",
         "Shortlisted",
         "Rejected",
+        "Interview Scheduled",
         "Selected"
     ])
 

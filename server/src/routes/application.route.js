@@ -9,6 +9,6 @@ const router = express.Router()
 router.post('/apply/:companyId' ,isLoggedIn , authorise("student") ,applyCompany)
 router.get('/my' ,isLoggedIn , authorise("student") ,getApplication )
 router.get('/company/:companyId' ,isLoggedIn , authorise("admin") ,getAllApplication )
-router.patch('/:applicationId/status' ,validate(updateStatusSchema),isLoggedIn , authorise("admin") ,updateApplication )
+router.patch('/status/:applicationId' ,validate(updateStatusSchema),isLoggedIn , authorise("admin") ,updateApplication )
 
 export default router

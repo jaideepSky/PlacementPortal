@@ -28,6 +28,7 @@ import {
 import { useSelector, useDispatch } from "react-redux"; // ← redux
 
 import { useAllApplicationsData, useAllStudentData } from "../../hooks/useAllData.js";
+import { useUpdateApplication } from "../../hooks/useApplication.js";
 
 const STATUS_CONFIG = {
   Applied: {
@@ -109,7 +110,7 @@ function UpdateStatusModal({ app, onSave, onClose }) {
             <div>
               <h3 className="font-semibold text-gray-900">Update Status</h3>
               <p className="text-xs text-gray-400">
-                {app.studentName} → {app.companyName}
+                {app.student.user.name} → {app.company.name}
               </p>
             </div>
           </div>
@@ -187,7 +188,7 @@ function UpdateStatusModal({ app, onSave, onClose }) {
               Cancel
             </button>
             <button
-              onClick={() => onSave(status, round)}
+              onClick={() => onSave(status, round,app)}
               className="flex-1 flex items-center justify-center gap-2 bg-blue-700 text-white py-2.5 rounded-xl font-medium hover:bg-blue-800 transition-colors shadow-md shadow-blue-200 text-sm"
             >
               <Save className="w-4 h-4" /> Save Changes
@@ -202,10 +203,10 @@ function UpdateStatusModal({ app, onSave, onClose }) {
 // ── StudentDetailModal ────────────────────────────────────────
 function StudentDetailModal({ student, apps, onClose }) {
   
-  // Get all Application //
+  // Get all Application of particular Student //
 
-  const { data: applicationData } = useAllApplicationsData();
-  const studentApps = applicationData?.data ?? [];
+  const studentApps = apps.filter((app)=> app.student._id == student._id)
+
 
   const selected = studentApps.filter((a) => a.status === "Selected");
 
@@ -230,7 +231,7 @@ function StudentDetailModal({ student, apps, onClose }) {
               {student.user.name.charAt(0)}
             </div>
             <div>
-              <h2 className="font-bold text-white text-lg">{student.name}</h2>
+              <h2 className="font-bold text-white text-lg">{student.user.name}</h2>
               <p className="text-blue-200 text-sm">{student.rollNo}</p>
               <p className="text-blue-200 text-sm">
                 {student.department} • {student.year}
@@ -305,15 +306,15 @@ function StudentDetailModal({ student, apps, onClose }) {
               <div className="space-y-2">
                 {studentApps.map((app) => (
                   <div
-                    key={app.id}
+                    key={app._id}
                     className="flex items-center justify-between bg-gray-50 rounded-xl p-3"
                   >
                     <div>
                       <p className="text-sm font-medium text-gray-800">
-                        {app.companyName}
+                        {app.company.name}
                       </p>
                       <p className="text-xs text-gray-400">
-                        {app.jobRole} • {app.packageLPA} LPA
+                        {app.company.jobRole} • {app.company.packageLPA} LPA
                       </p>
                     </div>
                     <StatusBadge status={app.status} />
@@ -356,6 +357,9 @@ export default function StudentApplicationManagement() {
    // Get all Students // 
     const {data:studentData} = useAllStudentData()
       const students = studentData?.data ?? []
+
+      // get update application 
+       const {mutate} = useUpdateApplication()
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -402,11 +406,11 @@ export default function StudentApplicationManagement() {
       return b.student.cgpa - a.student.cgpa;
     });
 
-  // ← dispatch updateStatus instead of setApplications
-  const handleStatusUpdate = (status, round) => {
+  //  updateStatus instead of setApplications
+  const handleStatusUpdate = (status, round,app) => {
     if (!updateApp) return;
-    dispatch(updateStatus({ id: updateApp.id, status, round })); // ← redux
-    showToast(`Status updated for ${updateApp.studentName}`);
+    mutate({appId:app._id,status})
+    showToast(`Status updated for ${updateApp.student.user.name}`);
     setUpdateApp(null);
   };
 
@@ -570,7 +574,7 @@ export default function StudentApplicationManagement() {
           </p>
         </div>
         {/* card View */}
-        /* Card View */
+        
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.length === 0 ? (
             <div className="col-span-full bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
@@ -593,7 +597,7 @@ export default function StudentApplicationManagement() {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900 text-sm">
-                          {app.student.user.name.studentName}
+                          {app.student.user.name}
                         </p>
                         <p className="text-xs text-gray-400">
                           {app.student.rollNo} • CGPA {app.student.cgpa}
