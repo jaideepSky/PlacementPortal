@@ -25,60 +25,59 @@ const registerUser = async (req, res) => {
     cgpa,
     phone,
   } = req.body;
-  console.log(req.body)
+  console.log(req.body);
 
   const existingUser = await User.findOne({ email });
-  const existingStudent = await Student.findOne({rollNo})
+  const existingStudent = await Student.findOne({ rollNo });
 
   if (existingUser) {
-   throw new ApiError(400,"User already exists")
+    throw new ApiError(400, "User already exists");
   }
 
-   if (existingStudent) {
-   throw new ApiError(400 , "Student already exists")
+  if (existingStudent) {
+    throw new ApiError(400, "Student already exists");
   }
 
-  let session
+  let session;
   try {
-   
-   
-
-   session = await mongoose.startSession()
-    session.startTransaction()
-     const user = await User.create([{ name, email, password }],{session});
-      const student = await Student.create([{
-      user: user[0]._id,
-      rollNo,
-      department,
-      year,
-      cgpa,
-      phone,
-    }],{session});
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const user = await User.create([{ name, email, password }], { session });
+    const student = await Student.create(
+      [
+        {
+          user: user[0]._id,
+          rollNo,
+          department,
+          year,
+          cgpa,
+          phone,
+        },
+      ],
+      { session }
+    );
     await session.commitTransaction();
-    
-    
-
 
     if (!user) {
-     throw new ApiError(400 ,"User not registered")
+      throw new ApiError(400, "User not registered");
     }
     if (!student) {
-      throw new ApiError(400 ,"Student not registered")
+      throw new ApiError(400, "Student not registered");
     }
     res.status(201).json(
-       new ApiResponse(
+      new ApiResponse(
         201,
         {
-            user: user,
-            student: student
+          user: user,
+          student: student,
         },
         "User registered successfully"
-    )
+      )
     );
 
     console.log(user);
   } catch (error) {
-     if (session) {
+    if (session) {
       await session.abortTransaction();
     }
     res.status(500).json({
@@ -92,52 +91,54 @@ const registerUser = async (req, res) => {
 // *Login
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new ApiError(401 ,"Invalid email or password")
-    }
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(401, "Invalid email or password");
+  }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new ApiError(401 ,"Invalid email or password")
-    }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid email or password");
+  }
 
-    const token = jwt.sign(
-      { id: user._id, name: user.name, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-    console.log(jwt.decode(token));
-
-   const cookieOption = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 24 * 60 * 60 * 1000,
-};
-    res.cookie("token", token, cookieOption);
-    return res.status(200).json(
-     new ApiResponse(200,{user:user},"Login Successfully")
-    );
-    console.log(user);
-  
-})
+  const token = jwt.sign(
+    { id: user._id, name: user.name, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+  console.log(jwt.decode(token));
+  const cookieOption = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+  };
+  res.cookie("token", token, cookieOption);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { user: user }, "Login Successfully"));
+  console.log(user);
+});
 
 const logoutUser = asyncHandler(async (req, res) => {
   res.cookie("token", "", {});
-  return res.status(200).json(
-    ApiResponse(200 , "Logout Successfully")
-  );
-})
+  return res.status(200).json(ApiResponse(200, "Logout Successfully"));
+});
 
-const getme = asyncHandler(async(req,res)=>{
-  const user = await User.findById(req.user.id)
-  if(!user){
-    throw new ApiError(404,"User not found")
+const getme = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
   }
-  return res.status(200).json(
-    new ApiResponse(200 , {user:user} ,"Current Student fetched Successfully" )
-  )
-})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: user },
+        "Current Student fetched Successfully"
+      )
+    );
+});
 
-export { registerUser, loginUser, logoutUser , getme };
+export { registerUser, loginUser, logoutUser, getme };
