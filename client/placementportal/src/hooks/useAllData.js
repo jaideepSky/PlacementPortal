@@ -16,7 +16,7 @@ export const useAllStudentData = ()=>{
 export const useAllApplicationsData = (page , limit=10)=>{
     const query = useQuery({
         queryKey:["application-data", page,limit],
-        queryFn:getAllApplications({page, limit})
+        queryFn: () =>getAllApplications({page, limit})
     })
     if (query.isError) {
     console.error(query.error.message);

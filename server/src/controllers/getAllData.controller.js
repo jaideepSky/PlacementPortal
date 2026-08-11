@@ -35,7 +35,6 @@ const getAllApplications = async (req, res) => {
           },
         })
         .populate("company")
-        .sort({ _id: 1 })
         .skip(skip)
         .limit(limit),
       Application.countDocuments(),
