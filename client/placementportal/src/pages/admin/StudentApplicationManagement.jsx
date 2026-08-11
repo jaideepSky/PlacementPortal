@@ -353,13 +353,14 @@ const limit = 10;
   
   // Get all Application // 
 
-      const {data:applicationData} = useAllApplicationsData()
+      const {data:applicationData} = useAllApplicationsData(page , limit)
         const applications = applicationData?.data ?? []
+         const pagination = applicationData?.pagination;
 
    // Get all Students // 
-    const {data:studentData} = useAllStudentData(page , limit)
+    const {data:studentData} = useAllStudentData()
       const students = studentData?.data ?? []
-      const pagination = studentData?.pagination;
+     
 
       // get update application 
        const {mutate} = useUpdateApplication()
