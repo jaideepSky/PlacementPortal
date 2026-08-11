@@ -665,6 +665,9 @@ const limit = 10;
             ))
           )}
         </div>
+        <pre>
+  {JSON.stringify(pagination, null, 2)}
+</pre>
         {pagination && pagination.totalPages > 1 && (
   <div className="flex items-center justify-center gap-4 mt-6">
     <button
