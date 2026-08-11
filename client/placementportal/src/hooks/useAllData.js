@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 import { getAllApplications, getAllStudents } from "../services/getAllStudents.service.js"
 
-export const useAllStudentData = ()=>{
+export const useAllStudentData = (page , limit=10)=>{
     const query = useQuery({
-        queryKey:["student-data"],
-        queryFn:getAllStudents
+        queryKey:["student-data" , page,limit],
+        queryFn:getAllStudents({page, limit})
     })
     if (query.isError) {
     console.error(query.error.message);

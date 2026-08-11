@@ -348,6 +348,8 @@ function StudentDetailModal({ student, apps, onClose }) {
 // ── Main Component ────────────────────────────────────────────
 export default function StudentApplicationManagement() {
   const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+const limit = 10;
   
   // Get all Application // 
 
@@ -355,8 +357,9 @@ export default function StudentApplicationManagement() {
         const applications = applicationData?.data ?? []
 
    // Get all Students // 
-    const {data:studentData} = useAllStudentData()
+    const {data:studentData} = useAllStudentData(page , limit)
       const students = studentData?.data ?? []
+      const pagination = studentData?.pagination;
 
       // get update application 
        const {mutate} = useUpdateApplication()
@@ -573,8 +576,8 @@ export default function StudentApplicationManagement() {
             {filtered.length} applications
           </p>
         </div>
+
         {/* card View */}
-        
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.length === 0 ? (
             <div className="col-span-full bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
@@ -661,6 +664,31 @@ export default function StudentApplicationManagement() {
             ))
           )}
         </div>
+        {pagination && pagination.totalPages > 1 && (
+  <div className="flex items-center justify-center gap-4 mt-6">
+    <button
+      onClick={() => setPage((prev) => prev - 1)}
+      disabled={page === 1 || isFetching}
+      className="px-4 py-2 rounded-xl border border-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+    >
+      Previous
+    </button>
+
+    <span className="text-sm text-gray-600">
+      Page {pagination.currentPage} of {pagination.totalPages}
+    </span>
+
+    <button
+      onClick={() => setPage((prev) => prev + 1)}
+      disabled={
+        page === pagination.totalPages || isFetching
+      }
+      className="px-4 py-2 rounded-xl border border-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+    >
+      Next
+    </button>
+  </div>
+)}
         {filtered.length > 0 && (
           <p className="text-xs text-gray-400 mt-3 px-1">
             Showing {filtered.length} of {applications.length} applications
