@@ -356,6 +356,8 @@ const limit = 10;
       const {data:applicationData , isFetching} = useAllApplicationsData(page , limit)
         const applications = applicationData?.data ?? []
          const pagination = applicationData?.pagination;
+         console.log("APPLICATION DATA:", applicationData);
+console.log("PAGINATION:", pagination);
 
    // Get all Students // 
     const {data:studentData} = useAllStudentData()
