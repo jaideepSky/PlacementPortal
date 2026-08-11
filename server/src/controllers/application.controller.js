@@ -69,7 +69,9 @@ const applyCompany = async (req, res) => {
 
 const getApplication = async (req, res) => {
   try {
+     console.log("Authenticated user:", req.user);
     const student = await Student.findOne({ user: req.user.id });
+       console.log("Student found:", student?._id);
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -79,6 +81,15 @@ const getApplication = async (req, res) => {
     const applications = await Application.find({
       student: student._id,
     }).populate("company").populate("student");
+
+     console.log(
+      "Applications:",
+      applications.map(app => ({
+        applicationId: app._id,
+        studentId: app.student?._id,
+        company: app.company?.name
+      }))
+    );
 
     if (applications.length === 0) {
       return res.json({

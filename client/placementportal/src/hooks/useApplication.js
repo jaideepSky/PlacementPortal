@@ -3,10 +3,12 @@ import { getloggedInStudentApplications } from "../services/getApplicationData.s
 import { applyApplication } from "../services/applyApplication.service.js";
 import toast from "react-hot-toast";
 import { updateApplication } from "../services/updateApplication.service.js";
+import { useSelector } from "react-redux";
 
 export const useLoggedInStudentApplications = () => {
+  const {user} = useSelector((state) => state.auth.user);
   const query = useQuery({
-    queryKey: ["application-data"],
+    queryKey: ["application-data",user?._id],
     queryFn: getloggedInStudentApplications,
   });
   if (query.isError) {

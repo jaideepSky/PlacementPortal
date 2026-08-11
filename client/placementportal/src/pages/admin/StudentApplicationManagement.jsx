@@ -347,6 +347,7 @@ function StudentDetailModal({ student, apps, onClose }) {
 
 // ── Main Component ────────────────────────────────────────────
 export default function StudentApplicationManagement() {
+  // console.log("STUDENT APPLICATION PAGE RENDERED");
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
 const limit = 10;
@@ -667,9 +668,7 @@ console.log("PAGINATION:", pagination);
             ))
           )}
         </div>
-        <pre>
-  {JSON.stringify(pagination, null, 2)}
-</pre>
+       
         {pagination && pagination.totalPages > 1 && (
   <div className="flex items-center justify-center gap-4 mt-6">
     <button

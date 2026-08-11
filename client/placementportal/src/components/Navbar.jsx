@@ -5,6 +5,7 @@ import { GraduationCap, Menu, X, Bell, User, LogOut, ChevronDown } from "lucide-
 
 import { useSelector  , useDispatch} from "react-redux";
 import { logout } from "../redux/slices/authSlice.js";
+import { logoutUser } from "../services/auth.service.js";
 export function Navbar() {
     const dispatch = useDispatch();
   const {user , isAuthenticated } = useSelector((state) => state.auth);
@@ -14,6 +15,7 @@ export function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
+    await logoutUser()
         dispatch(logout())
     navigate("/");
   };

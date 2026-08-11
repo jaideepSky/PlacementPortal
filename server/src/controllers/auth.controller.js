@@ -121,8 +121,17 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie("token", "", {});
-  return res.status(200).json(ApiResponse(200, "Logout Successfully"));
+ res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite:
+      process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logout successfull",
+  });
 });
 
 const getme = asyncHandler(async (req, res) => {
