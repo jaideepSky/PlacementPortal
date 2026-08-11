@@ -353,7 +353,7 @@ const limit = 10;
   
   // Get all Application // 
 
-      const {data:applicationData} = useAllApplicationsData(page , limit)
+      const {data:applicationData , isFetching} = useAllApplicationsData(page , limit)
         const applications = applicationData?.data ?? []
          const pagination = applicationData?.pagination;
 
